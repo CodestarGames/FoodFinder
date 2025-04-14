@@ -70,6 +70,7 @@ docker compose up
   - SSR
   - Type safe Server functions 
   - Intuitive data/state management
+  - Shareable links to specific resturaunts thanks to router
 
 - **ShadCn** https://ui.shadcn.com/
   - Al-acarte ui components
