@@ -11,18 +11,11 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
-import { Route as RedirectImport } from './routes/redirect'
 import { Route as PlacesRouteImport } from './routes/places/route'
 import { Route as IndexImport } from './routes/index'
 import { Route as PlacesFsqidImport } from './routes/places/$fsq_id'
 
 // Create/Update Routes
-
-const RedirectRoute = RedirectImport.update({
-  id: '/redirect',
-  path: '/redirect',
-  getParentRoute: () => rootRoute,
-} as any)
 
 const PlacesRouteRoute = PlacesRouteImport.update({
   id: '/places',
@@ -60,13 +53,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PlacesRouteImport
       parentRoute: typeof rootRoute
     }
-    '/redirect': {
-      id: '/redirect'
-      path: '/redirect'
-      fullPath: '/redirect'
-      preLoaderRoute: typeof RedirectImport
-      parentRoute: typeof rootRoute
-    }
     '/places/$fsq_id': {
       id: '/places/$fsq_id'
       path: '/$fsq_id'
@@ -94,14 +80,12 @@ const PlacesRouteRouteWithChildren = PlacesRouteRoute._addFileChildren(
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/places': typeof PlacesRouteRouteWithChildren
-  '/redirect': typeof RedirectRoute
   '/places/$fsq_id': typeof PlacesFsqidRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/places': typeof PlacesRouteRouteWithChildren
-  '/redirect': typeof RedirectRoute
   '/places/$fsq_id': typeof PlacesFsqidRoute
 }
 
@@ -109,29 +93,26 @@ export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
   '/places': typeof PlacesRouteRouteWithChildren
-  '/redirect': typeof RedirectRoute
   '/places/$fsq_id': typeof PlacesFsqidRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/places' | '/redirect' | '/places/$fsq_id'
+  fullPaths: '/' | '/places' | '/places/$fsq_id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/places' | '/redirect' | '/places/$fsq_id'
-  id: '__root__' | '/' | '/places' | '/redirect' | '/places/$fsq_id'
+  to: '/' | '/places' | '/places/$fsq_id'
+  id: '__root__' | '/' | '/places' | '/places/$fsq_id'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   PlacesRouteRoute: typeof PlacesRouteRouteWithChildren
-  RedirectRoute: typeof RedirectRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   PlacesRouteRoute: PlacesRouteRouteWithChildren,
-  RedirectRoute: RedirectRoute,
 }
 
 export const routeTree = rootRoute
@@ -145,8 +126,7 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
-        "/places",
-        "/redirect"
+        "/places"
       ]
     },
     "/": {
@@ -157,9 +137,6 @@ export const routeTree = rootRoute
       "children": [
         "/places/$fsq_id"
       ]
-    },
-    "/redirect": {
-      "filePath": "redirect.tsx"
     },
     "/places/$fsq_id": {
       "filePath": "places/$fsq_id.tsx",

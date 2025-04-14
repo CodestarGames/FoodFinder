@@ -65,3 +65,5 @@ export type PlacesSearchAPIResponse = {
         }
     }
 };
+
+export type PlacesSort = "RELEVANCE" | "RATING" | "DISTANCE" ;

@@ -15,28 +15,23 @@ const cogentIcon = new Leafet.Icon({
     iconSize: new Leafet.Point(40, 40),
 });
 
-export function CogentMarker({position, children}: { position: LatLngTuple; children: React.ReactNode }) {
-    return (
-        <Marker position={position} icon={cogentIcon}>
-            {children}
-        </Marker>
-    );
+export function CogentMarker({position}: { position: LatLngTuple; }) {
+    return <Marker position={position} icon={cogentIcon}>
+        <Popup offset={[1.2, 0]}>Hello from Cogent Labs!</Popup>
+    </Marker>
+
 }
 
-export function MapComponent({
-                                 center,
-                                 children,
-                                 focusPoint,
-                             }: Readonly<MapComponentInput>) {
-    
+export function MapComponent({center, children, focusPoint}: Readonly<MapComponentInput>) {
+
     const mapRef = useRef<Map>(null);
     const containerRef = useRef(null);
-    
+
     useEffect(() => {
         const map = mapRef.current;
 
         const container = containerRef.current;
-        if(container) {
+        if (container) {
             const resizeObserver = new ResizeObserver(() => {
                 if (map) {
                     map.invalidateSize();
@@ -54,12 +49,12 @@ export function MapComponent({
 
     useEffect(() => {
         const map = mapRef.current;
-        if(map) { 
+        if (map) {
             map.flyTo(focusPoint as LatLngExpression);
             map.invalidateSize();
         }
     }, [focusPoint]);
-    
+
     return (
         <div ref={containerRef} style={{width: '100%', height: '400px'}}>
             <MapContainer
@@ -82,16 +77,10 @@ export function MapComponent({
                     fillOpacity={0.3}
                     color="#ab5cff"
                     opacity={0.6}
-                ></Circle>
-                <CogentMarker position={center}>
-                    <Popup offset={[1.2, 0]}>
-                        <div className="flex flex-col">
-                            Hello from Cogent Labs!
-                        </div>
-                    </Popup>
-                </CogentMarker>
+                />
+                <CogentMarker position={center}/>
                 {children}
             </MapContainer>
         </div>
-            );
+    );
 }

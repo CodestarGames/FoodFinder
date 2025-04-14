@@ -1,19 +1,17 @@
-import {useQuery, useQueryClient, useSuspenseQuery} from '@tanstack/react-query'
 import {
     Outlet,
     createFileRoute,
     useNavigate, useSearch,
 } from '@tanstack/react-router'
-import {MapComponent} from "@/components/map/map";
-import {cogentLocation, cogentLocationTuple, PlacesSort} from "@/utils/constants";
+import {MapComponent} from "@/features/map";
+import {cogentLocationTuple} from "@/utils/constants";
 import {Marker, Popup} from "react-leaflet";
-import {LatLngTuple} from "leaflet";
-import {Suspense, useEffect, useState} from "react";
-import {AppSidebar} from "@/components/app-sidebar/app-sidebar";
+import {Suspense} from "react";
+import {AppSidebar} from "@/features/app-sidebar";
 import * as React from "react";
 import {search} from "@/server/api";
-import {PlacesSearchAPIResponse} from "@/schema/placesApi";
-
+import {PlacesAPIResultItem, PlacesSearchAPIResponse, PlacesSort} from "@/schema/placesApi";
+import {getPlaceLatLon} from "@/utils/places";
 
 type PlacesSearch = {
     keywords: string;
@@ -21,60 +19,68 @@ type PlacesSearch = {
     lucky: boolean
 }
 export const Route = createFileRoute('/places')({
-    validateSearch: (search) : PlacesSearch => {
-        return {...search} as PlacesSearch
-    },
-    loaderDeps: ({ search: { keywords, sortBy, lucky } }) => ({ keywords, sortBy, lucky }),
-    loader: async ({ context, deps: {keywords="", sortBy="RELEVANCE", lucky=false} }) => 
-        search({data:{keywords, sortBy, lucky}}),
+    validateSearch: (search): PlacesSearch => ({...search} as PlacesSearch),
+    loaderDeps: ({search: {keywords, sortBy, lucky}}) => ({keywords, sortBy, lucky}),
+    loader: async ({deps: {keywords = "", sortBy = "RELEVANCE", lucky = false}}) => search({
+        data: {
+            keywords,
+            sortBy,
+            lucky
+        }
+    }),
     ssr: false,
-  component: PlacesComponent,
+    component: PlacesComponent,
 })
+
+function PlaceMarker({place}: { place: PlacesAPIResultItem }) {
+    const navigate = useNavigate();
+    const routeSearch = useSearch({from: "/places"})
+    const search = useSearch({from: "/places/$fsq_id", shouldThrow: false});
+
+    const showPopup = search?.geo && (search.geo.latitude === place.geocodes.main.latitude && search.geo.longitude === place.geocodes.main.longitude);
+    const eventHandlers = {
+        click: (e: unknown) => {
+            navigate({
+                to: "/places/$fsq_id",
+                params: {fsq_id: place.fsq_id},
+                search: {...routeSearch, geo: place.geocodes.main}
+            })
+        }
+    }
+
+    return (
+        <>
+            <Marker riseOnHover position={getPlaceLatLon(place.geocodes.main)} eventHandlers={eventHandlers}/>
+            {
+                showPopup && <Popup position={getPlaceLatLon(search.geo)} offset={[0, -32]}>
+                    <div className="flex flex-col">
+                        <strong>{place.name}</strong>
+                        {place.categories[0].name}
+                    </div>
+                </Popup>
+            }
+        </>
+    );
+
+}
 
 function PlacesComponent() {
 
-    const data : PlacesSearchAPIResponse = Route.useLoaderData()
+    const data: PlacesSearchAPIResponse = Route.useLoaderData()
     const navigate = useNavigate();
     const routeSearch = Route.useLoaderDeps()
-
-    function getPlaceLatLon({ latitude, longitude }: { latitude: number, longitude: number }) : LatLngTuple {
-        return [ latitude, longitude];
-    }
-
-    const search  = useSearch({from:"/places/$fsq_id", shouldThrow: false });
-    
-    const formattedGeo = search ? getPlaceLatLon(search.geo): cogentLocationTuple
+    const search = useSearch({from: "/places/$fsq_id", shouldThrow: false});
+    const formattedGeo = search ? getPlaceLatLon(search.geo) : cogentLocationTuple
 
     return (
-    <main className="w-full flex flex-row ">
-        <Suspense>
-        <AppSidebar places={data?.results} />
-        </Suspense>
-        <Outlet />
-        <Suspense>
+        <main className="w-full flex flex-row ">
+            <Suspense>
+                <AppSidebar places={data?.results}/>
+            </Suspense>
+            <Outlet/>
             <MapComponent center={cogentLocationTuple} focusPoint={formattedGeo}>
-                { data?.results.map(place => (
-                    <><Marker riseOnHover position={getPlaceLatLon(place.geocodes.main)}
-                            eventHandlers={{
-                                click: (e) => {
-                                    navigate({to: "/places/$fsq_id", params: {fsq_id: place.fsq_id}, search: {...routeSearch, geo: place.geocodes.main }})
-                                },
-                            }}
-                    >
-                    </Marker>
-                    {search?.geo && (search.geo.latitude === place.geocodes.main.latitude 
-                    && search.geo.longitude === place.geocodes.main.longitude
-                    ) && <Popup position={formattedGeo} offset={[0, -32]}>
-                            <div className="flex flex-col">
-                                <strong>{place.name}</strong>
-                                {place.categories[0].name}
-                            </div>
-                        </Popup>}
-                    </>)) }
+                {data?.results.map((place, index) => <PlaceMarker place={place} key={index}/>)}
             </MapComponent>
-        </Suspense>
-        
-
-    </main>
-  )
+        </main>
+    )
 }
