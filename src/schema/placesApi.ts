@@ -10,7 +10,7 @@ export type PlacesAPIResultItem = {
     distance: number;
     price: number;
     categories: {
-        id: string;
+        id: number;
         name: string;
     }[];
     link: string;

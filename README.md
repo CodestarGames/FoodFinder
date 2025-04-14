@@ -1,72 +1,103 @@
-# Welcome to TanStack.com!
+# Food Finder!
 
-This site is built with TanStack Router!
+A resturaunt locator application written in Typescript using TanstackStart! This application finds restuarants in a certain radius using the FourSquare Places Api. It shows a mapview of nearby places and details including: photos, information, reviews, etc.
 
-- [TanStack Router Docs](https://tanstack.com/router)
 
-It's deployed automagically with Netlify!
+## Requirements
+- node js
+- pnpm
+- Foursquare Places API key
 
-- [Netlify](https://netlify.com/)
+## Setup
+1. Install dependencies:
+   ```bash
+   pnpm install
+   ```
+2. Set up environment variables:
+   ```bash
+   cp .env.example .env
+   ```
 
-## Development
+3. Add your Foursquare API key to `.env`
 
-From your terminal:
 
-```sh
-pnpm install
+### Development
+```bash
 pnpm dev
 ```
 
-This starts your app in development mode, rebuilding assets on file changes.
-
-## Editing and previewing the docs of TanStack projects locally
-
-The documentations for all TanStack projects except for `React Charts` are hosted on [https://tanstack.com](https://tanstack.com), powered by this TanStack Router app.
-In production, the markdown doc pages are fetched from the GitHub repos of the projects, but in development they are read from the local file system.
-
-Follow these steps if you want to edit the doc pages of a project (in these steps we'll assume it's [`TanStack/form`](https://github.com/tanstack/form)) and preview them locally :
-
-1. Create a new directory called `tanstack`.
-
-```sh
-mkdir tanstack
+### Build
+```bash
+pnpm build
+pnpm start
 ```
 
-2. Enter the directory and clone this repo and the repo of the project there.
-
-```sh
-cd tanstack
-git clone git@github.com:TanStack/tanstack.com.git
-git clone git@github.com:TanStack/form.git
+### Docker
+```bash
+docker compose up
 ```
 
-> [!NOTE]
-> Your `tanstack` directory should look like this:
->
-> ```
-> tanstack/
->    |
->    +-- form/
->    |
->    +-- tanstack.com/
-> ```
 
-> [!WARNING]
-> Make sure the name of the directory in your local file system matches the name of the project's repo. For example, `tanstack/form` must be cloned into `form` (this is the default) instead of `some-other-name`, because that way, the doc pages won't be found.
+## Directory structure 
 
-3. Enter the `tanstack/tanstack.com` directory, install the dependencies and run the app in dev mode:
+- `components/`: Contains installed ShadCn components
 
-```sh
-cd tanstack.com
-pnpm i
-# The app will run on https://localhost:3000 by default
-pnpm dev
-```
+- `features/`: contains the components made specific to features of food finder.
 
-4. Now you can visit http://localhost:3000/form/latest/docs/overview in the browser and see the changes you make in `tanstack/form/docs`.
+- `hooks/`: contains hooks installed by ShadCn components
 
-> [!NOTE]
-> The updated pages need to be manually reloaded in the browser.
+- `lib/`: contains utilities installed by ShadCn components
 
-> [!WARNING]
-> You will need to update the `docs/config.json` file (in the project's repo) if you add a new doc page!
+- `server/`: contains the tanstack server api functions 
+
+- `schema/`: contains types used by food finder
+
+- `routes/`: contains tanstack router route definitions
+
+- `styles/`: contains tailwind global styles
+
+- `test/`: contains vitest componenent tests
+
+- `utils/`: contains shared utilities and constants
+
+
+### Tech & trade offs
+
+
+- **Tanstack Start** https://tanstack.com/start/latest
+  - Great development ecosystem
+  - Easy route generation and type safety
+  - SSR
+  - Type safe Server functions 
+  - Intuitive data/state management
+
+- **ShadCn** https://ui.shadcn.com/
+  - Al-acarte ui components
+  - Easy installation and customization 
+
+- **React-Leaflet** https://react-leaflet.js.org/
+  - Most popular react library to work with leaflet.js
+
+- **Tailwind** https://tailwindcss.com/
+  - Intuitive CSS system
+  - Ability to merge styles
+  - Default for ShadCn
+
+- **Trade offs**
+    - Tanstack start is still in beta
+    - Tailwind classes can clutter codebase, an alternative approach would be using something more Typescript friendly like Vanilla Extract or Panda
+    - leaflet.js is an old mapping library that's difficult to work with in React
+    - ShadCn components can add bloat to a project, an alternative would be to roll an in house design system.
+
+
+### Possible Future Improvements
+  - Allow expanding the search area to a larger portion of the map.
+  - Easy food category filtering
+  - Price filtering
+  - Decoupling the frontend/backend if there's an architectural reason for splitting the two.
+  - Adding more component tests
+  - Adding backend/e2e tests
+  - Adding redis or some other better caching solution
+  - Adding better css transitions for ui interactions
+  - using a more modern mapping solution like Mapbox
+
