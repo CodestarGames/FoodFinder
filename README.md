@@ -101,4 +101,5 @@ docker compose up
   - Adding redis or some other better caching solution
   - Adding better css transitions for ui interactions
   - using a more modern mapping solution like Mapbox
+  - Design a better mobile experience
 
