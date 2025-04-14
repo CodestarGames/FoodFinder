@@ -12,12 +12,20 @@ import * as React from "react";
 import {search} from "@/server/api";
 import {PlacesAPIResultItem, PlacesSearchAPIResponse, PlacesSort} from "@/schema/placesApi";
 import {getPlaceLatLon} from "@/utils/places";
+import Leafet from "leaflet";
 
 type PlacesSearch = {
     keywords: string;
     sortBy: PlacesSort;
     lucky: boolean
 }
+
+
+const markerIcon = new Leafet.Icon({
+    iconUrl: "/map-pin.svg",
+    iconSize: new Leafet.Point(40, 40),
+});
+
 export const Route = createFileRoute('/places')({
     validateSearch: (search): PlacesSearch => ({...search} as PlacesSearch),
     loaderDeps: ({search: {keywords, sortBy, lucky}}) => ({keywords, sortBy, lucky}),
@@ -50,9 +58,9 @@ function PlaceMarker({place}: { place: PlacesAPIResultItem }) {
 
     return (
         <>
-            <Marker riseOnHover position={getPlaceLatLon(place.geocodes.main)} eventHandlers={eventHandlers}/>
+            <Marker icon={markerIcon} riseOnHover position={getPlaceLatLon(place.geocodes.main)} eventHandlers={eventHandlers}/>
             {
-                showPopup && <Popup position={getPlaceLatLon(search.geo)} offset={[0, -32]}>
+                showPopup && <Popup position={getPlaceLatLon(search.geo)} offset={[0, -8]}>
                     <div className="flex flex-col">
                         <strong>{place.name}</strong>
                         {place.categories[0].name}

@@ -1,8 +1,7 @@
-import {Circle, MapContainer, Marker, Popup, TileLayer, useMapEvents} from "react-leaflet";
+import {Circle, MapContainer, Marker, Popup, TileLayer} from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import Leafet, {LatLngExpression, LatLngTuple, Map} from "leaflet";
 import {useEffect, useRef} from "react";
-import {useNavigate} from "@tanstack/react-router";
 
 type MapComponentInput = {
     center: LatLngTuple;
