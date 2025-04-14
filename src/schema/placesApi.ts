@@ -32,7 +32,24 @@ export type PlacesDetailAPIResponse =
     verified: boolean;
     website: string;
     menu: string;
+    photos: PlacePhoto[],
+    tips: Tip[]
 };
+
+export type PlacePhoto = {
+    "id": string,
+    "created_at": string,
+    "prefix": string,
+    "suffix": string,
+    "width": number,
+    "height": number
+};
+
+export type Tip = {
+    created_at: string;
+    text: string;
+}
+
     
 export type PlacesSearchAPIResponse = {
     results: PlacesAPIResultItem[],
