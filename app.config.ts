@@ -5,9 +5,9 @@ export default defineConfig({
   tsr: {
     appDirectory: 'src',
   },
-  server: {
-    preset: 'vercel',
-  },
+  // server: { disabled for docker run
+  //   preset: 'vercel',
+  // },
   vite: {
     plugins: [
       tsConfigPaths({

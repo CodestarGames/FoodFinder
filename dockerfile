@@ -1,48 +1,31 @@
-# Build Stage
-FROM node:23 AS builder
+# Expose the port the app runs on
+FROM node:20-slim AS base
+
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable
 
-# Inject API key at compile stage
-ARG VITE_FOURSQUARE_API_KEY
-ENV VITE_FOURSQUARE_API_KEY $VITE_FOURSQUARE_API_KEY
-
-# Set the working directory
+COPY . /app
 WORKDIR /app
 
-# Copy package.json and pnpm-lock.json
-COPY package*.json ./
-COPY pnpm-lock.yaml ./
+FROM base AS prod-deps
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --prod --frozen-lockfile
 
-# Install dependencies
-RUN pnpm install
+FROM base AS build
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
+RUN pnpm run build
 
-# Copy the rest of the application code
-COPY . .
-
-# Build the Tanstack-start app
-RUN pnpm build
-
-# Production Stage
-FROM node:23-alpine
+FROM base
 
 # Inject API key at runtime
 ARG VITE_FOURSQUARE_API_KEY
 ENV VITE_FOURSQUARE_API_KEY $VITE_FOURSQUARE_API_KEY
 
-# Copy the built application from the builder stage
-COPY --from=builder /app/package.json /app/package.json
-COPY --from=builder /app/.output /app/.output
-COPY --from=builder /app/.vinxi /app/.vinxi
-COPY --from=builder /app/node_modules /app/node_modules
-COPY --from=builder /app/public /app/public
 
-# Set the working directory
-WORKDIR /app
+COPY --from=prod-deps /app/node_modules /app/node_modules
+COPY --from=build /app/package.json /app
+COPY --from=build /app/.output /app/.output
+COPY --from=build /app/.vinxi /app/.vinxi
 
-# Expose the port the app runs on
 EXPOSE 3000
-
-# Start the Tanstack-start app
-CMD ["pnpm", "start"]
+CMD [ "node", ".output/server/index.mjs" ]
